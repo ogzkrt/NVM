@@ -1,0 +1,33 @@
+fact_loop:1:1:
+    IPUSH,1     // i = 1
+    STORE,1
+    IPUSH,1     // RESULT = 1
+    STORE,2
+loop:
+    LOAD,1      // if ( i < n )
+    LOAD,0
+    ILT,
+    JZ, finish
+
+    LOAD,2      // result = result * i
+    LOAD,1
+    IMUL
+    STORE,2
+
+    LOAD,1      // i = i+1
+    IPUSH,1
+    IADD,
+    STORE,1
+
+    JMP, loop
+
+finish:
+    LOAD,2,
+    RET
+
+
+main:0:0:
+    IPUSH,6 // fact(5) -> (n+1)
+    CALL, fact_loop
+    PRINT
+    STOP

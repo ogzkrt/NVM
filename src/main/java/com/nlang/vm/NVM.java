@@ -5,19 +5,23 @@ import static com.nlang.vm.InstructionSet.*;
 
 public class NVM {
 
-    public int[] code;
-    public int[] stack;
+    private final boolean debugMode;
+    private final int[] code;
+    private final int[] stack;
 
-    public int[] globalMemory;
+    private int sp = -1;
+    private int ip = 0;
 
-    public int sp = -1;
-    public int ip = 0;
+    private Context context;
 
-    public Context context;
-
-    public FunctionInfo[] functionTable;
+    private final FunctionInfo[] functionTable;
 
     public NVM(int[] code, FunctionInfo[] functionTable) {
+        this(code, functionTable, false);
+    }
+
+    public NVM(int[] code, FunctionInfo[] functionTable, boolean debugMode) {
+        this.debugMode = debugMode;
         this.code = code;
         this.stack = new int[1024];
         this.functionTable = functionTable;
@@ -30,6 +34,11 @@ public class NVM {
         int inst = code[ip];
         while (inst != STOP) {
             execute(inst);
+            if (debugMode) {
+                Diagnostic.printInstruction(inst, code, ip);
+                Diagnostic.printStack(stack, sp);
+                Diagnostic.printCallMemory(context);
+            }
             inst = code[ip];
         }
     }
@@ -131,5 +140,4 @@ public class NVM {
                 throw new UnsupportedOperationException(String.format("INST %s is not supported", inst));
         }
     }
-
 }

@@ -4,7 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static com.nlang.vm.InstructionSet.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -117,9 +121,9 @@ class NVMTest {
                 RET,            //9
                 // return fib(n-1) + fib(n-2);
                 LOAD, 0,        //10
-                IPUSH,1,
+                IPUSH, 1,
                 ISUB,
-                CALL,1,
+                CALL, 1,
                 LOAD, 0,
                 IPUSH, 2,
                 ISUB,
@@ -141,6 +145,38 @@ class NVMTest {
         vm = new NVM(code, functionTable);
         vm.execute();
         assertEquals("28657" + System.lineSeparator(), outputStream.toString());
+    }
+
+
+    @Test
+    void readFromFileFibonacciRecursive() throws IOException {
+        executeFromFile("./examples/fibonacci_recursive.nbyte", "28657");
+    }
+
+    @Test
+    void readFromFileFactorialRecursive() throws IOException {
+        executeFromFile("./examples/factorial_recursive.nbyte", "120");
+    }
+
+    @Test
+    void readFromFileFactorialLoop() throws IOException {
+        executeFromFile("./examples/factorial_loop.nbyte", "120");
+    }
+
+    @Test
+    void readFromFileAverage() throws IOException {
+        executeFromFile("./examples/average.nbyte", "8");
+    }
+
+    private void executeFromFile(String filePath, String expected) throws IOException {
+        String s = Files.readString(Path.of(filePath));
+        BytecodeLexer lexer = new BytecodeLexer();
+        lexer.parse(List.of(s.split("\n")));
+
+        int[] bytecode = lexer.getBytecode();
+        NVM vm = new NVM(bytecode, lexer.functionTable);
+        vm.execute();
+        assertEquals(expected + System.lineSeparator(), outputStream.toString());
     }
 
 }

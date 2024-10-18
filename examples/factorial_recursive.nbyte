@@ -1,0 +1,21 @@
+factorial:1:1:
+    LOAD,0
+    IPUSH,2
+    ILT,
+    JZ, ELSE
+    IPUSH,1
+    RET
+ELSE:
+    LOAD,0
+    LOAD,0
+    IPUSH,1
+    ISUB,
+    CALL, factorial
+    IMUL,
+    RET
+
+main:0:0:
+    IPUSH, 5
+    CALL, factorial
+    PRINT
+    STOP

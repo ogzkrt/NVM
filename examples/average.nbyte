@@ -1,4 +1,4 @@
-main:0:0: // func avg(a,b) { return (a+b)/2;}
+main:0:0:       // (a+b)/2
     IPUSH, 2
     IPUSH, 14
     IADD,
