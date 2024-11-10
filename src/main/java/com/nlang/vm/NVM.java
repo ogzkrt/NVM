@@ -33,11 +33,13 @@ public class NVM {
         ip = context.info.address;
         int inst = code[ip];
         while (inst != STOP) {
-            execute(inst);
             if (debugMode) {
                 Diagnostic.printInstruction(inst, code, ip);
+                execute(inst);
                 Diagnostic.printStack(stack, sp);
                 Diagnostic.printCallMemory(context);
+            } else {
+                execute(inst);
             }
             inst = code[ip];
         }
@@ -45,86 +47,97 @@ public class NVM {
 
     private void execute(int inst) {
         int first, second;
+        int result, address, index;
+        float fFirst, fSecond;
         switch (inst) {
-            case IPUSH:
-                int val = code[++ip];
-                stack[++sp] = val;
+            case PUSH:
+                push(getOperand());
                 ip++;
                 break;
             case IADD:
-                first = stack[sp--];
-                second = stack[sp--];
-                stack[++sp] = first + second;
+                first = pop();
+                second = pop();
+                push(second + first);
                 ip++;
                 break;
             case ISUB:
-                first = stack[sp--];
-                second = stack[sp--];
-                stack[++sp] = second - first;
+                first = pop();
+                second = pop();
+                push(second - first);
                 ip++;
                 break;
             case IMUL:
-                first = stack[sp--];
-                second = stack[sp--];
-                stack[++sp] = first * second;
+                first = pop();
+                second = pop();
+                push(second * first);
                 ip++;
                 break;
             case IDIV:
-                first = stack[sp--];
-                second = stack[sp--];
-                stack[++sp] = second / first;
+                first = pop();
+                second = pop();
+                push(second / first);
+                ip++;
+                break;
+            case FADD:
+                fFirst = popFloat();
+                fSecond = popFloat();
+                pushFloat(fSecond + fFirst);
+                ip++;
+                break;
+            case FSUB:
+                fFirst = popFloat();
+                fSecond = popFloat();
+                pushFloat(fSecond - fFirst);
+                ip++;
+                break;
+            case FMUL:
+                fFirst = popFloat();
+                fSecond = popFloat();
+                pushFloat(fSecond * fFirst);
+                ip++;
+                break;
+            case FDIV:
+                fFirst = popFloat();
+                fSecond = popFloat();
+                pushFloat(fSecond / fFirst);
                 ip++;
                 break;
             case ILT:
-                first = stack[sp--];
-                second = stack[sp--];
-                if (second < first) {
-                    stack[++sp] = 1;
-                } else {
-                    stack[++sp] = 0;
-                }
+                first = pop();
+                second = pop();
+                push(second < first ? 1 : 0);
                 ip++;
                 break;
             case JZ:
-                int loc = code[++ip];
-                int r = stack[sp--];
-                if (r == 1) {
-                    ip++;
-                } else {
-                    ip = loc;
-                }
+                address = getOperand();
+                result = pop();
+                ip = result == 0 ? address : ip + 1;
                 break;
             case JNZ:
-                int jnz = code[++ip];
-                int rJnz = stack[sp--];
-                if (rJnz == 1) {
-                    ip = jnz;
-                } else {
-                    ip++;
-                }
+                address = getOperand();
+                result = pop();
+                ip = result == 1 ? address : ip + 1;
                 break;
             case JMP:
                 ip = code[ip + 1];
                 break;
             case LOAD:
-                int idx = code[++ip];
-                stack[++sp] = context.memory[idx];
+                index = getOperand();
+                push(context.memory[index]);
                 ip++;
                 break;
             case STORE:
-                int sIdx = code[++ip];
-                context.memory[sIdx] = stack[sp--];
+                index = getOperand();
+                context.memory[index] = pop();
                 ip++;
                 break;
             case CALL:
-                int fIndex = code[++ip];
+                int fIndex = getOperand();
                 FunctionInfo functionInfo = functionTable[fIndex];
                 context = new Context(context, functionInfo, ip + 1);
-                int firstArg = sp - functionInfo.argCount + 1;
-                //System.out.println("CALL WITH: " + stack[firstArg]);
-                for (int i = 0; i < functionInfo.argCount; i++) {
-                    context.memory[i] = stack[firstArg + i];
-                }
+                int srcPosition = sp - (functionInfo.argCount - 1);
+                if (functionInfo.argCount >= 0)
+                    System.arraycopy(stack, srcPosition, context.memory, 0, functionInfo.argCount);
                 sp -= functionInfo.argCount;
                 ip = functionInfo.address;
                 break;
@@ -133,11 +146,43 @@ public class NVM {
                 context = context.parent;
                 break;
             case PRINT:
-                System.out.println(stack[sp--]);
+                System.out.println(pop());
+                ip++;
+                break;
+            case FPRINT:
+                System.out.println(popFloat());
                 ip++;
                 break;
             default:
                 throw new UnsupportedOperationException(String.format("INST %s is not supported", inst));
         }
+    }
+
+    private int getOperand() {
+        return code[++ip];
+    }
+
+    private int pop() {
+        if (sp == -1) {
+            Diagnostic.printInstruction(code[ip], code, ip);
+            throw new UnsupportedOperationException("Trying to pop from empty stack");
+        }
+        return stack[sp--];
+    }
+
+    private void push(int value) {
+        if (sp >= stack.length - 1) {
+            Diagnostic.printInstruction(code[ip], code, ip);
+            throw new UnsupportedOperationException("Stackoverflow");
+        }
+        stack[++sp] = value;
+    }
+
+    private float popFloat() {
+        return Float.intBitsToFloat(pop());
+    }
+
+    private void pushFloat(float value) {
+        push(Float.floatToIntBits(value));
     }
 }

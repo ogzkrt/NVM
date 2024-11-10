@@ -1,0 +1,11 @@
+main:0:0:
+    PUSH, 3.14
+    PUSH, 2.4
+    STORE, 0
+    STORE, 1
+    LOAD,0
+    LOAD,1
+    FMUL
+    FPRINT
+    STOP
+

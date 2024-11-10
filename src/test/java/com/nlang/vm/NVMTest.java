@@ -30,8 +30,8 @@ class NVMTest {
     void testSum() {
 
         int[] code = {
-                IPUSH, 242,
-                IPUSH, 22,
+                PUSH, 242,
+                PUSH, 22,
                 IADD,
                 PRINT,
                 STOP,
@@ -51,12 +51,12 @@ class NVMTest {
                 LOAD, 0,        //0
                 LOAD, 1,        //2
                 IADD,           //4
-                IPUSH, 2,       //5
+                PUSH, 2,       //5
                 IDIV,           //7
                 RET,            //8
 
-                IPUSH, 150,     //9
-                IPUSH, 44,      //11
+                PUSH, 150,     //9
+                PUSH, 44,      //11
                 CALL, 1,        //13  CALL <Function_Index>
                 PRINT,          //15
                 STOP,           //16
@@ -78,21 +78,21 @@ class NVMTest {
         int[] code = {
                 // if (n<2) return 1;
                 LOAD, 0,        //0
-                IPUSH, 2,       //2
+                PUSH, 2,       //2
                 ILT,            //4
                 JZ, 10,         //5
-                IPUSH, 1,       //7
+                PUSH, 1,       //7
                 RET,            //9
                 // return n * fact(n-1);
                 LOAD, 0,        //10
                 LOAD, 0,        //12
-                IPUSH, 1,       //14
+                PUSH, 1,       //14
                 ISUB,           //16
                 CALL, 1,        //17
                 IMUL,           //19
                 RET,            //20
 
-                IPUSH, 4,       //21 MAIN
+                PUSH, 4,       //21 MAIN
                 CALL, 1,        //23 CALL <Function_Index>
                 PRINT,          //25
                 STOP,           //26
@@ -114,24 +114,24 @@ class NVMTest {
         int[] code = {
                 // if (n<2) return n;
                 LOAD, 0,        //0
-                IPUSH, 2,       //2
+                PUSH, 2,       //2
                 ILT,            //4
                 JZ, 10,         //5
                 LOAD, 0,        //7
                 RET,            //9
                 // return fib(n-1) + fib(n-2);
                 LOAD, 0,        //10
-                IPUSH, 1,
+                PUSH, 1,
                 ISUB,
                 CALL, 1,
                 LOAD, 0,
-                IPUSH, 2,
+                PUSH, 2,
                 ISUB,
                 CALL, 1,
                 IADD,
                 RET,
 
-                IPUSH, 23,      // MAIN
+                PUSH, 23,      // MAIN
                 CALL, 1,        // CALL <Function_Index>
                 PRINT,
                 STOP,
@@ -167,14 +167,17 @@ class NVMTest {
     void readFromFileAverage() throws IOException {
         executeFromFile("./examples/average.nbyte", "8");
     }
+    @Test
+    void readFromFileFloat() throws IOException {
+        executeFromFile("./examples/float.nbyte", "7.5360007");
+    }
 
     private void executeFromFile(String filePath, String expected) throws IOException {
         String s = Files.readString(Path.of(filePath));
         BytecodeLexer lexer = new BytecodeLexer();
         lexer.parse(List.of(s.split("\n")));
 
-        int[] bytecode = lexer.getBytecode();
-        NVM vm = new NVM(bytecode, lexer.functionTable);
+        int[] bytecode = lexer.getBytecode();NVM vm = new NVM(bytecode, lexer.functionTable);
         vm.execute();
         assertEquals(expected + System.lineSeparator(), outputStream.toString());
     }

@@ -1,23 +1,23 @@
 fib:1:1: // if(n<2) return n;
     LOAD, 0
-    IPUSH, 2
+    PUSH, 2
     ILT
     JZ, recursion
     LOAD, 0
     RET
 recursion: // return fib(n-1) + fib(n-2);
     LOAD, 0
-    IPUSH, 1
+    PUSH, 1
     ISUB
     CALL, fib
     LOAD, 0
-    IPUSH, 2
+    PUSH, 2
     ISUB
     CALL, fib
     IADD
     RET
 main:0:0:
-    IPUSH, 23
+    PUSH, 23
     CALL, fib
     PRINT
     STOP

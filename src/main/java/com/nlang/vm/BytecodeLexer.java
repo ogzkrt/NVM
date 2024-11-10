@@ -103,11 +103,32 @@ class BytecodeLexer {
                 }
                 currentAddress++;
             } else {
-                int arg = Integer.parseInt(argument);
-                bytecode.add(arg);
+                if (isInteger(argument)) {
+                    bytecode.add(Integer.parseInt(argument));
+                } else if (isFloat(argument)) {
+                    bytecode.add(Float.floatToIntBits(Float.parseFloat(argument)));
+                }
                 currentAddress++;
             }
         }
+    }
+
+    private boolean isFloat(String arg) {
+        try {
+            Float.parseFloat(arg);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isInteger(String arg) {
+        try {
+            Integer.parseInt(arg);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 
     private boolean isLabel(String argument) {

@@ -1,8 +1,8 @@
 main:0:0:       // (a+b)/2
-    IPUSH, 2
-    IPUSH, 14
+    PUSH, 2
+    PUSH, 14
     IADD,
-    IPUSH, 2
+    PUSH, 2
     IDIV,
     PRINT,
     STOP
