@@ -1,0 +1,43 @@
+fib_loop:1:1:
+    PUSH,1     // i = 1
+    STORE,1
+    PUSH,0    // RESULT
+    STORE,2
+    PUSH,0     //FIB0
+    STORE,3
+    PUSH,1  // FIB1
+    STORE,4
+loop:
+    LOAD,1      // if ( i < n )
+    LOAD,0
+    ILT,
+    JZ, finish
+
+    LOAD,3      // result = fib0 + fib1
+    LOAD,4
+    IADD
+    STORE,2
+
+    LOAD,4    // FIB0 = FIB1
+    STORE,3
+
+    LOAD,2     // FIB1= RESULT
+    STORE,4
+
+
+    LOAD,1      // i = i+1
+    PUSH,1
+    IADD,
+    STORE,1
+
+    JMP, loop
+
+finish:
+    LOAD,2,
+    RET
+
+main:0:0:
+    PUSH, 36 // fib(x)
+    CALL, fib_loop
+    PRINT
+    STOP
