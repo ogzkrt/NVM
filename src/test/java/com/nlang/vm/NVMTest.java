@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static com.nlang.vm.InstructionSet.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -167,17 +166,25 @@ class NVMTest {
     void readFromFileAverage() throws IOException {
         executeFromFile("./examples/average.nbyte", "8");
     }
+
     @Test
     void readFromFileFloat() throws IOException {
         executeFromFile("./examples/float.nbyte", "7.5360007");
     }
 
+    @Test
+    void readFromFileStringPrint() throws IOException {
+        executeFromFile("./examples/hello.nbyte", "Hello, World");
+    }
+
+
     private void executeFromFile(String filePath, String expected) throws IOException {
         String s = Files.readString(Path.of(filePath));
         BytecodeLexer lexer = new BytecodeLexer();
-        lexer.parse(List.of(s.split("\n")));
+        lexer.parseCode(s);
 
-        int[] bytecode = lexer.getBytecode();NVM vm = new NVM(bytecode, lexer.functionTable);
+        int[] bytecode = lexer.getBytecode();
+        NVM vm = new NVM(bytecode, lexer.functionTable, lexer.getStringPool());
         vm.execute();
         assertEquals(expected + System.lineSeparator(), outputStream.toString());
     }

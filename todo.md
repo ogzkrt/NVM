@@ -1,3 +1,4 @@
 - Fix memory issue for each function frame
 - Introduce string operations
 - Introduce array operations
+- Get rid of commas between instruction and operand

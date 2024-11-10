@@ -1,5 +1,8 @@
 package com.nlang.vm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.nlang.vm.InstructionSet.*;
 
 
@@ -8,6 +11,7 @@ public class NVM {
     private final boolean debugMode;
     private final int[] code;
     private final int[] stack;
+    private final Map<Integer, String> stingPools;
 
     private int sp = -1;
     private int ip = 0;
@@ -16,16 +20,24 @@ public class NVM {
 
     private final FunctionInfo[] functionTable;
 
-    public NVM(int[] code, FunctionInfo[] functionTable) {
-        this(code, functionTable, false);
-    }
 
-    public NVM(int[] code, FunctionInfo[] functionTable, boolean debugMode) {
+    public NVM(int[] code, FunctionInfo[] functionTable, boolean debugMode, Map<Integer, String> stringPools) {
         this.debugMode = debugMode;
         this.code = code;
         this.stack = new int[1024];
         this.functionTable = functionTable;
         this.context = new Context(null, functionTable[0], code.length - 1);
+        this.stingPools = stringPools;
+    }
+
+    public NVM(int[] code, FunctionInfo[] functionTable, Map<Integer, String> stringPool) {
+        this(code, functionTable, false, stringPool);
+
+    }
+
+    public NVM(int[] code, FunctionInfo[] functionTable) {
+        this(code, functionTable, null);
+
     }
 
 
@@ -108,6 +120,11 @@ public class NVM {
                 push(second < first ? 1 : 0);
                 ip++;
                 break;
+            case IGTE:
+                first = pop();
+                second = pop();
+                push(second >= first ? 1 : 0);
+                ip++;
             case JZ:
                 address = getOperand();
                 result = pop();
@@ -124,6 +141,11 @@ public class NVM {
             case LOAD:
                 index = getOperand();
                 push(context.memory[index]);
+                ip++;
+                break;
+            case LDC:
+                index = getOperand();
+                push(index);
                 ip++;
                 break;
             case STORE:
@@ -151,6 +173,10 @@ public class NVM {
                 break;
             case FPRINT:
                 System.out.println(popFloat());
+                ip++;
+                break;
+            case SPRINT:
+                System.out.println(stingPools.get(pop()));
                 ip++;
                 break;
             default:

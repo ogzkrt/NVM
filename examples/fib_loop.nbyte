@@ -1,3 +1,4 @@
+#code
 fib_loop:1:1:
     PUSH,1     // i = 1
     STORE,1

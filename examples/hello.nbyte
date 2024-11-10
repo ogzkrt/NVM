@@ -1,0 +1,9 @@
+#constants
+0:"Hello, World"
+1:"From the other side"
+
+#code
+main:0:0:
+    LDC,0
+    SPRINT
+    STOP

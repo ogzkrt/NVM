@@ -11,6 +11,7 @@ class BytecodeLexer {
 
 
     final FunctionInfo[] functionTable = new FunctionInfo[10];
+    private final Map<Integer, String> stringPool = new HashMap<>();
     private final List<Integer> bytecode = new ArrayList<>();
     private final Map<String, Integer> labelAddresses = new HashMap<>();
     private final List<PendingJump> pendingJumps = new ArrayList<>();
@@ -37,7 +38,36 @@ class BytecodeLexer {
         }
     }
 
-    public void parse(List<String> lines) {
+    private void parseStringPool(List<String> lines) {
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+            String[] parts = line.split(":");
+            int index = Integer.parseInt(parts[0]);
+            stringPool.put(index, parts[1].substring(1, parts[1].length() - 1));
+        }
+    }
+
+    public void parseCode(String s) {
+        String[] parts = s.split("#");
+        for (String part : parts) {
+            if (part.isEmpty()) {
+                continue;
+            }
+            List<String> lines = new ArrayList<>(List.of(part.split("\n")));
+            String firstLine = lines.removeFirst();
+            if (firstLine.startsWith("code")) {
+                parseCode(lines);
+            } else if (firstLine.startsWith("constants")) {
+                parseStringPool(lines);
+            }
+        }
+    }
+
+    private void parseCode(List<String> lines) {
+
         for (String s : lines) {
             String line = s.trim();
 
@@ -45,6 +75,10 @@ class BytecodeLexer {
                 continue;
             }
             line = line.trim();
+            if (line.startsWith("#strings")) {
+                // parse strings
+
+            }
             if (line.contains("//")) {
                 line = line.substring(0, line.indexOf("//")).trim();
             }
@@ -166,6 +200,9 @@ class BytecodeLexer {
         return bytecode.stream().mapToInt(i -> i).toArray();
     }
 
+    public Map<Integer, String> getStringPool() {
+        return stringPool;
+    }
 }
 
 

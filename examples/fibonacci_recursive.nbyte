@@ -1,3 +1,4 @@
+#code
 fib:1:1: // if(n<2) return n;
     LOAD, 0
     PUSH, 2
