@@ -1,9 +1,9 @@
 #code
 main:0:0:       // (a+b)/2
-    PUSH, 2
-    PUSH, 14
-    IADD,
-    PUSH, 2
-    IDIV,
-    PRINT,
+    PUSH 2
+    PUSH 14
+    IADD
+    PUSH 2
+    IDIV
+    PRINT
     STOP

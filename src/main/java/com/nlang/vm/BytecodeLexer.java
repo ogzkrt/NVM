@@ -1,9 +1,6 @@
 package com.nlang.vm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.nlang.vm.InstructionSet.STOI;
 
@@ -70,20 +67,13 @@ class BytecodeLexer {
 
         for (String s : lines) {
             String line = s.trim();
-
             if (line.isEmpty() || line.startsWith("//")) {
                 continue;
             }
-            line = line.trim();
-            if (line.startsWith("#strings")) {
-                // parse strings
-
-            }
             if (line.contains("//")) {
-                line = line.substring(0, line.indexOf("//")).trim();
+                line = line.split("//")[0].trim();
             }
-
-            if (line.contains(":") && !line.contains(",")) {
+            if (line.contains(":")) {
                 parseFunctionOrLabel(line);
             } else {
                 parseInstruction(line);
@@ -107,8 +97,8 @@ class BytecodeLexer {
     }
 
     private void parseInstruction(String line) {
-        String[] parts = line.split(",\\s*");
-        String instruction = parts[0];
+        final List<String> parts = Arrays.stream(line.split(" ")).filter(p->!p.isEmpty()).toList();
+        String instruction = parts.getFirst();
 
         Integer opcode = STOI.get(instruction);
         if (opcode == null) {
@@ -118,8 +108,8 @@ class BytecodeLexer {
         bytecode.add(opcode);
         currentAddress++;
 
-        if (parts.length > 1) {
-            String argument = parts[1];
+        if (parts.size() > 1) {
+            String argument = parts.get(1);
 
             if (opcode.equals(STOI.get("JZ")) || opcode.equals(STOI.get("JMP"))) {
                 bytecode.add(0);

@@ -64,7 +64,7 @@ public class InstructionSet {
 
     static {
         INFO_MAP.put(STOP, new InstInfo(STOP, 0, "STOP"));
-        INFO_MAP.put(PUSH, new InstInfo(PUSH, 1, "PUSH"));
+        INFO_MAP.put(PUSH,  new InstInfo(PUSH,  1, "PUSH"));
 
         INFO_MAP.put(IADD, new InstInfo(IADD, 0, "IADD"));
         INFO_MAP.put(ISUB, new InstInfo(ISUB, 0, "ISUB"));

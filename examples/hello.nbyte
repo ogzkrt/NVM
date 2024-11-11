@@ -4,6 +4,6 @@
 
 #code
 main:0:0:
-    LDC,0
+    LDC 0
     SPRINT
     STOP

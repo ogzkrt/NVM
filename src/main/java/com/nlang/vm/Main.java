@@ -7,7 +7,7 @@ import java.nio.file.Path;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        String s = Files.readString(Path.of("./examples/hello.nbyte"));
+        String s = Files.readString(Path.of("./examples/average.nbyte"));
         BytecodeLexer lexer = new BytecodeLexer();
         lexer.parseCode(s);
 
